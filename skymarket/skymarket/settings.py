@@ -33,7 +33,6 @@ ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
-
 # TODO здесь тоже нужно подключить Swagger и corsheaders
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -43,11 +42,18 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "djoser",
+    "phonenumber_field",
+    "drf_yasg",
+    "documentation",
+    "corsheaders",
+    "django_filters",
     "users",
     "ads",
     "redoc",
 ]
 
+AUTH_USER_MODEL = "users.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -82,9 +88,23 @@ WSGI_APPLICATION = "skymarket.wsgi.application"
 
 # TODO здесь мы настраиваем аутентификацию и пагинацию
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 100
 }
 # TODO здесь мы настраиваем Djoser
 DJOSER = {
+    "SERIALIZERS": {
+        "user_create": "users.serializers.UserRegistrationSerializer",
+        "current_user": "users.serializers.CurrentUserSerializer"
+    },
+    "LOGIN_FIELD": "email",
+    "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
+    "EMAIL": {
+        "password_reset": "users.email.PasswordResetEmail",
+    }
 }
 
 # Database
@@ -92,9 +112,15 @@ DJOSER = {
 
 # TODO здесь необходимо настроить подключение к БД
 DATABASES = {
+    "default": {
+        "ENGINE": os.environ.get("DB_ENGINE"),
+        "HOST": os.environ.get("DB_HOST"),
+        "NAME": os.environ.get("DB_NAME"),
+        "PORT": os.environ.get("DB_PORT"),
+        "USER": os.environ.get("DB_USER"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+    },
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
